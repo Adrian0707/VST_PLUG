@@ -30,7 +30,7 @@ void VST_PLUGAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText ("SPD project Nice", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void VST_PLUGAudioProcessorEditor::resized()
