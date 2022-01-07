@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="RnpnTq" name="VST_PLUG" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              cppLanguageStandard="17">
   <MAINGROUP id="KysDIc" name="VST_PLUG">
     <GROUP id="{B66D8A62-A13C-9A48-64A1-7F65F1CC82EF}" name="Source">
       <FILE id="w1gFuZ" name="PluginProcessor.cpp" compile="1" resource="0"
