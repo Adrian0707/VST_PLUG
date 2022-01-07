@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Dynamic folders
+Builds/
+JuceLibraryCode/
