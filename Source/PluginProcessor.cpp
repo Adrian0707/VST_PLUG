@@ -191,8 +191,8 @@ bool VST_PLUGAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* VST_PLUGAudioProcessor::createEditor()
 {
-    //return new VST_PLUGAudioProcessorEditor (*this);
-    return new juce::GenericAudioProcessorEditor(*this);
+    return new VST_PLUGAudioProcessorEditor (*this);
+    //return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -208,73 +208,73 @@ void VST_PLUGAudioProcessor::setStateInformation (const void* data, int sizeInBy
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
-ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
-    ChainSettings settings;
-    settings.Azimuth = apvts.getRawParameterValue("Azimuth")->load();
-    settings.Elevation = apvts.getRawParameterValue("Elevation")->load();
-    settings.Roll = apvts.getRawParameterValue("Roll")->load();
-    settings.Width = apvts.getRawParameterValue("Width")->load();
-    settings.W = apvts.getRawParameterValue("W")->load();
-    settings.X = apvts.getRawParameterValue("X")->load();
-    settings.Y = apvts.getRawParameterValue("Y")->load();
-    settings.Z = apvts.getRawParameterValue("Z")->load();
-    return settings;
-}
+//ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
+//    ChainSettings settings;
+//    settings.Azimuth = apvts.getRawParameterValue("Azimuth")->load();
+//    settings.Elevation = apvts.getRawParameterValue("Elevation")->load();
+//    settings.Roll = apvts.getRawParameterValue("Roll")->load();
+//    settings.Width = apvts.getRawParameterValue("Width")->load();
+//    settings.W = apvts.getRawParameterValue("W")->load();
+//    settings.X = apvts.getRawParameterValue("X")->load();
+//    settings.Y = apvts.getRawParameterValue("Y")->load();
+//    settings.Z = apvts.getRawParameterValue("Z")->load();
+//    return settings;
+//}
 
-juce::AudioProcessorValueTreeState::ParameterLayout VST_PLUGAudioProcessor::createParameterLayout()
-{
-    juce::AudioProcessorValueTreeState::ParameterLayout layout;
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Azimuth",
-        "Azimuth",
-        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Elevation",
-        "Elevation",
-        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Roll",
-        "Roll",
-        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Width",
-        "Width",
-        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "W",
-        "W",
-        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f),0.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "X",
-        "X",
-        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Y",
-        "Y",
-        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "Z",
-        "Z",
-        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
-
-    juce::StringArray stringArray;
-    for (int i = 0; i < 4; i++) {
-        juce::String str;
-        str << (12 + i * 12);
-        str << "db\OCT";
-        stringArray.add(str);
-    }
-
-    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCust Slope", stringArray, 0));
-    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
-
-    return layout;
-}
+//juce::AudioProcessorValueTreeState::ParameterLayout VST_PLUGAudioProcessor::createParameterLayout()
+//{
+//    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+//
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "Azimuth",
+//        "Azimuth",
+//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
+//
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "Elevation",
+//        "Elevation",
+//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
+//
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "Roll",
+//        "Roll",
+//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
+//
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "Width",
+//        "Width",
+//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
+//
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "W",
+//        "W",
+//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f),0.f));
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "X",
+//        "X",
+//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "Y",
+//        "Y",
+//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
+//    layout.add(std::make_unique<juce::AudioParameterFloat>(
+//        "Z",
+//        "Z",
+//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
+//
+//    juce::StringArray stringArray;
+//    for (int i = 0; i < 4; i++) {
+//        juce::String str;
+//        str << (12 + i * 12);
+//        str << "db\OCT";
+//        stringArray.add(str);
+//    }
+//
+//    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCust Slope", stringArray, 0));
+//    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+//
+//    return layout;
+//}
 
 //==============================================================================
 // This creates new instances of the plugin..
