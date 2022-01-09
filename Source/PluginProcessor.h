@@ -10,6 +10,10 @@
 
 #include <JuceHeader.h>
 
+struct ChainSettings {
+    float Azimuth{ 0 }, Elevation{ 0 }, Roll{ 0 }, Width{ 0 }, W{ 0 }, X{ 0 }, Y{ 0 }, Z{ 0 };
+};
+
 //==============================================================================
 /**
 */
@@ -61,6 +65,10 @@ private:
 
     MonoChain leftChain, rightChain;
 
+    enum ChainPostions {
+        Azimuth,
+        Elevation
+    };
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VST_PLUGAudioProcessor)

@@ -103,6 +103,16 @@ void VST_PLUGAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
     leftChain.prepare(spec);
     rightChain.prepare(spec);
+
+    //auto chainSettings = getChainSettings(apvts);
+
+    //auto peakCoefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
+    //    sampleRate,
+    //    chainSettings.Azimuth,
+    //    chainSettings.Elevation,
+    //    juce::Decibels::decibelsToGain(chainSettings.Roll));
+
+    //*leftChain.get<1>().coefficients = peakCoefficients;
 }
 
 void VST_PLUGAudioProcessor::releaseResources()
@@ -152,6 +162,16 @@ void VST_PLUGAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    /*auto chainSettings = getChainSettings(apvts);
+
+    auto peakCoefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
+        getSampleRate(),
+        chainSettings.Azimuth,
+        chainSettings.Elevation,
+        juce::Decibels::decibelsToGain(chainSettings.Roll));
+
+    *leftChain.get<1>().coefficients = peakCoefficients;*/
+
     juce::dsp::AudioBlock<float> block(buffer);
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
@@ -187,6 +207,18 @@ void VST_PLUGAudioProcessor::setStateInformation (const void* data, int sizeInBy
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
+    ChainSettings settings;
+    settings.Azimuth = apvts.getRawParameterValue("Azimuth")->load();
+    settings.Elevation = apvts.getRawParameterValue("Elevation")->load();
+    settings.Roll = apvts.getRawParameterValue("Roll")->load();
+    settings.Width = apvts.getRawParameterValue("Width")->load();
+    settings.W = apvts.getRawParameterValue("W")->load();
+    settings.X = apvts.getRawParameterValue("X")->load();
+    settings.Y = apvts.getRawParameterValue("Y")->load();
+    settings.Z = apvts.getRawParameterValue("Z")->load();
+    return settings;
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout VST_PLUGAudioProcessor::createParameterLayout()

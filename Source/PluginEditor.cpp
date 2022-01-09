@@ -13,9 +13,12 @@
 VST_PLUGAudioProcessorEditor::VST_PLUGAudioProcessorEditor (VST_PLUGAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    
+    mAzimuthSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    mAzimuthSlider.setRange(0,360,1);
+    mAzimuthSlider.setValue(0);
+    addAndMakeVisible(mAzimuthSlider);
+    setSize (600, 600);
 }
 
 VST_PLUGAudioProcessorEditor::~VST_PLUGAudioProcessorEditor()
@@ -35,6 +38,5 @@ void VST_PLUGAudioProcessorEditor::paint (juce::Graphics& g)
 
 void VST_PLUGAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    mAzimuthSlider.setBounds(getWidth()/2 -100, getHeight() / 2- 100, 100, 150);
 }
