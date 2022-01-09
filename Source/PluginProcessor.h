@@ -10,9 +10,9 @@
 
 #include <JuceHeader.h>
 
-struct ChainSettings {
-    float Azimuth{ 0 }, Elevation{ 0 }, Roll{ 0 }, Width{ 0 }, W{ 0 }, X{ 0 }, Y{ 0 }, Z{ 0 };
-};
+//struct ChainSettings {
+//    float Azimuth{ 0 }, Elevation{ 0 }, Roll{ 0 }, Width{ 0 }, W{ 0 }, X{ 0 }, Y{ 0 }, Z{ 0 };
+//};
 
 //==============================================================================
 /**
@@ -58,17 +58,22 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 //    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 //    juce::AudioProcessorValueTreeState apvts{*this, nullptr, "Parameters", createParameterLayout() };
+
+    juce::AudioProcessorValueTreeState& getState();
 private:
-    using Filter = juce::dsp::IIR::Filter<float>;
-    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
-    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+    juce::ScopedPointer<juce::AudioProcessorValueTreeState> state;
+    //using Filter = juce::dsp::IIR::Filter<float>;
+    //using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+    //using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
 
-    MonoChain leftChain, rightChain;
+    //MonoChain leftChain, rightChain;
 
-    enum ChainPostions {
-        Azimuth,
-        Elevation
-    };
+    //float mAzimuth{ 0.0 };
+
+    //enum ChainPostions {
+    //    Azimuth,
+    //    Elevation
+    //};
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VST_PLUGAudioProcessor)

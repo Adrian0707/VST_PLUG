@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+//using namespace juce;
 
 //==============================================================================
 /**
@@ -25,7 +26,18 @@ public:
     void resized() override;
 
 private:
-    juce::Slider mAzimuthSlider;
+
+    juce::ScopedPointer<juce::Slider> azimuthKnob;
+    juce::ScopedPointer<juce::Slider> elevationKnob;
+    juce::ScopedPointer<juce::Slider> rollKnob;
+    juce::ScopedPointer<juce::Slider> widthKnob;
+
+    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> azimuthAttachment;
+    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> elevationAttachment;
+    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> rollAttachment;
+    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
+   //juce::Slider mAzimuthSlider;
+    //juce::TextLayout textLayout;
     VST_PLUGAudioProcessor& audioProcessor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VST_PLUGAudioProcessorEditor)

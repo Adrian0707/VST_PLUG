@@ -22,6 +22,16 @@ VST_PLUGAudioProcessor::VST_PLUGAudioProcessor()
                        )
 #endif
 {
+    state = new juce::AudioProcessorValueTreeState(*this, nullptr);
+    state->createAndAddParameter("azimuth", "Azimuth", "Azimuth", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("elevation", "Elevation", "Elevation", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("roll", "Roll", "Roll", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("width", "Width", "Width", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+
+    state->state = juce::ValueTree("azimuth");
+    state->state = juce::ValueTree("elevation");
+    state->state = juce::ValueTree("roll");
+    state->state = juce::ValueTree("width");
 }
 
 VST_PLUGAudioProcessor::~VST_PLUGAudioProcessor()
@@ -95,14 +105,14 @@ void VST_PLUGAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    juce::dsp::ProcessSpec spec;
+    //juce::dsp::ProcessSpec spec;
 
-    spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = 1;
-    spec.sampleRate = sampleRate;
+    //spec.maximumBlockSize = samplesPerBlock;
+    //spec.numChannels = 1;
+    //spec.sampleRate = sampleRate;
 
-    leftChain.prepare(spec);
-    rightChain.prepare(spec);
+    //leftChain.prepare(spec);
+    //rightChain.prepare(spec);
 
     //auto chainSettings = getChainSettings(apvts);
 
@@ -162,6 +172,52 @@ void VST_PLUGAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    float azimuth = *state->getRawParameterValue("azimuth");
+    float elevation = *state->getRawParameterValue("elevation");
+    float roll = *state->getRawParameterValue("roll");
+    float width = *state->getRawParameterValue("width");
+    azimuth = (azimuth * 3.14) / 180;
+    elevation = (elevation * 3.14) / 180;
+    roll = (roll * 3.14) / 180;
+    width = (width * 3.14) / 180;
+    float W, X, Y, Z;
+
+    float fCosAzim = cosf(azimuth);
+    float fSinAzim = sinf(azimuth);
+    float fCosElev = cosf(elevation);
+    float fSinElev = sinf(elevation);
+
+    float fCos2Azim = cosf(2.f * azimuth);
+    float fSin2Azim = sinf(2.f * azimuth);
+    float fSin2Elev = sinf(2.f * elevation);
+
+    W = 1;
+    X = (fCosAzim * fCosElev);
+    Y = (fSinAzim * fCosElev);
+    Z = (fSinElev);
+
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        auto* channelData = buffer.getWritePointer(channel);
+
+        for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
+            //channelData[sample] = channelData[sample]; //* mAzimuth;
+
+
+            //float cleanSig = *channelData;
+            //*channelData *= azimuth * elevation;
+            //*channelData = (((((2.f / 3.14f) * atan(*channelData)) * roll) + (cleanSig * (1.f / roll))) / 2) * width;
+            
+            if (channel == 0) {
+                *channelData = (sqrt(2) * W * *channelData + X * *channelData - Y * *channelData) * sqrt(8);
+            }
+            if (channel == 1) {
+                *channelData = (sqrt(2) * W * *channelData - X * *channelData + Y * *channelData) * sqrt(8);
+            }
+            channelData++;
+        }
+    }
+
     /*auto chainSettings = getChainSettings(apvts);
 
     auto peakCoefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
@@ -172,15 +228,19 @@ void VST_PLUGAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     *leftChain.get<1>().coefficients = peakCoefficients;*/
 
-    juce::dsp::AudioBlock<float> block(buffer);
-    auto leftBlock = block.getSingleChannelBlock(0);
-    auto rightBlock = block.getSingleChannelBlock(1);
+    //juce::dsp::AudioBlock<float> block(buffer);
+    //auto leftBlock = block.getSingleChannelBlock(0);
+    //auto rightBlock = block.getSingleChannelBlock(1);
 
-    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+    //juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    //juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
 
-    leftChain.process(leftContext);
-    rightChain.process(rightContext);
+    //leftChain.process(leftContext);
+    //rightChain.process(rightContext);
+}
+
+juce::AudioProcessorValueTreeState& VST_PLUGAudioProcessor::getState() {
+    return *state;
 }
 
 //==============================================================================
@@ -201,12 +261,20 @@ void VST_PLUGAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+
+    juce::MemoryOutputStream stream(destData, false);
+    state->state.writeToStream(stream);
 }
 
 void VST_PLUGAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    juce::ValueTree tree = juce::ValueTree::readFromData(data, sizeInBytes);
+
+    if (tree.isValid()) {
+        state->state = tree;
+    }
 }
 //ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
 //    ChainSettings settings;
