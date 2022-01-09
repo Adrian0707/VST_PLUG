@@ -95,6 +95,14 @@ void VST_PLUGAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    juce::dsp::ProcessSpec spec;
+
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 1;
+    spec.sampleRate = sampleRate;
+
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
 }
 
 void VST_PLUGAudioProcessor::releaseResources()
@@ -144,18 +152,15 @@ void VST_PLUGAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    juce::dsp::AudioBlock<float> block(buffer);
+    auto leftBlock = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
 
-        // ..do something to the data...
-    }
+    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+
+    leftChain.process(leftContext);
+    rightChain.process(rightContext);
 }
 
 //==============================================================================
@@ -189,33 +194,41 @@ juce::AudioProcessorValueTreeState::ParameterLayout VST_PLUGAudioProcessor::crea
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "LowCutFeq",
-        "LowCutFreq",
-        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f), 20.f));
+        "Azimuth",
+        "Azimuth",
+        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "HighCutFeq",
-        "HighCutFreq",
-        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f),
-        2000.f));
+        "Elevation",
+        "Elevation",
+        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "PeakFeq",
-        "PeakFreq",
-        juce::NormalisableRange<float>(20.f, 2000.f, 1.f, 1.f),
-        750.f));
+        "Roll",
+        "Roll",
+        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "PeakGainFeq",
-        "PeakGainFreq",
-        juce::NormalisableRange<float>(-24.f, 24.f, 0.5f, 1.f),
-        0.f));
+        "Width",
+        "Width",
+        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "PeakQuality",
-        "PeakQuality",
-        juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f),
-        1.f));
+        "W",
+        "W",
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f),0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "X",
+        "X",
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "Y",
+        "Y",
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "Z",
+        "Z",
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
 
     juce::StringArray stringArray;
     for (int i = 0; i < 4; i++) {
