@@ -10,34 +10,33 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-//using namespace juce;
+using namespace juce;
 
 //==============================================================================
 /**
 */
-class VST_PLUGAudioProcessorEditor  : public juce::AudioProcessorEditor
+class VST_PLUGAudioProcessorEditor  : public AudioProcessorEditor
 {
 public:
     VST_PLUGAudioProcessorEditor (VST_PLUGAudioProcessor&);
     ~VST_PLUGAudioProcessorEditor() override;
 
     //==============================================================================
-    void paint (juce::Graphics&) override;
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
 
-    juce::ScopedPointer<juce::Slider> azimuthKnob;
-    juce::ScopedPointer<juce::Slider> elevationKnob;
-    juce::ScopedPointer<juce::Slider> rollKnob;
-    juce::ScopedPointer<juce::Slider> widthKnob;
+    ScopedPointer<Slider> azimuthKnob;
+    ScopedPointer<Slider> elevationKnob;
+    ScopedPointer<Slider> rollKnob;
+    ScopedPointer<Slider> widthKnob;
 
-    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> azimuthAttachment;
-    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> elevationAttachment;
-    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> rollAttachment;
-    juce::ScopedPointer<juce::AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
-   //juce::Slider mAzimuthSlider;
-    //juce::TextLayout textLayout;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> azimuthAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> elevationAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> rollAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
+
     VST_PLUGAudioProcessor& audioProcessor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VST_PLUGAudioProcessorEditor)

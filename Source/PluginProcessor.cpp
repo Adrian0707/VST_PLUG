@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+using namespace juce;
 
 //==============================================================================
 VST_PLUGAudioProcessor::VST_PLUGAudioProcessor()
@@ -15,23 +16,23 @@ VST_PLUGAudioProcessor::VST_PLUGAudioProcessor()
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
                       #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                       .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        )
 #endif
 {
-    state = new juce::AudioProcessorValueTreeState(*this, nullptr);
-    state->createAndAddParameter("azimuth", "Azimuth", "Azimuth", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
-    state->createAndAddParameter("elevation", "Elevation", "Elevation", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
-    state->createAndAddParameter("roll", "Roll", "Roll", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
-    state->createAndAddParameter("width", "Width", "Width", juce::NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state = new AudioProcessorValueTreeState(*this, nullptr);
+    state->createAndAddParameter("azimuth", "Azimuth", "Azimuth", NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("elevation", "Elevation", "Elevation", NormalisableRange<float>(-90.f, 90.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("roll", "Roll", "Roll", NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("width", "Width", "Width", NormalisableRange<float>(0.f, 120.f, 1.f), 0, nullptr, nullptr);
 
-    state->state = juce::ValueTree("azimuth");
-    state->state = juce::ValueTree("elevation");
-    state->state = juce::ValueTree("roll");
-    state->state = juce::ValueTree("width");
+    state->state = ValueTree("azimuth");
+    state->state = ValueTree("elevation");
+    state->state = ValueTree("roll");
+    state->state = ValueTree("width");
 }
 
 VST_PLUGAudioProcessor::~VST_PLUGAudioProcessor()
@@ -39,7 +40,7 @@ VST_PLUGAudioProcessor::~VST_PLUGAudioProcessor()
 }
 
 //==============================================================================
-const juce::String VST_PLUGAudioProcessor::getName() const
+const String VST_PLUGAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
@@ -91,12 +92,12 @@ void VST_PLUGAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String VST_PLUGAudioProcessor::getProgramName (int index)
+const String VST_PLUGAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void VST_PLUGAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void VST_PLUGAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
@@ -105,24 +106,6 @@ void VST_PLUGAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    //juce::dsp::ProcessSpec spec;
-
-    //spec.maximumBlockSize = samplesPerBlock;
-    //spec.numChannels = 1;
-    //spec.sampleRate = sampleRate;
-
-    //leftChain.prepare(spec);
-    //rightChain.prepare(spec);
-
-    //auto chainSettings = getChainSettings(apvts);
-
-    //auto peakCoefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
-    //    sampleRate,
-    //    chainSettings.Azimuth,
-    //    chainSettings.Elevation,
-    //    juce::Decibels::decibelsToGain(chainSettings.Roll));
-
-    //*leftChain.get<1>().coefficients = peakCoefficients;
 }
 
 void VST_PLUGAudioProcessor::releaseResources()
@@ -135,15 +118,15 @@ void VST_PLUGAudioProcessor::releaseResources()
 bool VST_PLUGAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+    ignoreUnused (layouts);
     return true;
   #else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
     // load plugins that support stereo bus layouts.
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
+     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
@@ -157,9 +140,9 @@ bool VST_PLUGAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 }
 #endif
 
-void VST_PLUGAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
+    ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -217,29 +200,9 @@ void VST_PLUGAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             channelData++;
         }
     }
-
-    /*auto chainSettings = getChainSettings(apvts);
-
-    auto peakCoefficients = juce::dsp::IIR::ArrayCoefficients<float>::makePeakFilter(
-        getSampleRate(),
-        chainSettings.Azimuth,
-        chainSettings.Elevation,
-        juce::Decibels::decibelsToGain(chainSettings.Roll));
-
-    *leftChain.get<1>().coefficients = peakCoefficients;*/
-
-    //juce::dsp::AudioBlock<float> block(buffer);
-    //auto leftBlock = block.getSingleChannelBlock(0);
-    //auto rightBlock = block.getSingleChannelBlock(1);
-
-    //juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-    //juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
-
-    //leftChain.process(leftContext);
-    //rightChain.process(rightContext);
 }
 
-juce::AudioProcessorValueTreeState& VST_PLUGAudioProcessor::getState() {
+AudioProcessorValueTreeState& VST_PLUGAudioProcessor::getState() {
     return *state;
 }
 
@@ -249,20 +212,20 @@ bool VST_PLUGAudioProcessor::hasEditor() const
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* VST_PLUGAudioProcessor::createEditor()
+AudioProcessorEditor* VST_PLUGAudioProcessor::createEditor()
 {
     return new VST_PLUGAudioProcessorEditor (*this);
-    //return new juce::GenericAudioProcessorEditor(*this);
+    //return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void VST_PLUGAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void VST_PLUGAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 
-    juce::MemoryOutputStream stream(destData, false);
+    MemoryOutputStream stream(destData, false);
     state->state.writeToStream(stream);
 }
 
@@ -270,83 +233,16 @@ void VST_PLUGAudioProcessor::setStateInformation (const void* data, int sizeInBy
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-    juce::ValueTree tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    ValueTree tree = ValueTree::readFromData(data, sizeInBytes);
 
     if (tree.isValid()) {
         state->state = tree;
     }
 }
-//ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
-//    ChainSettings settings;
-//    settings.Azimuth = apvts.getRawParameterValue("Azimuth")->load();
-//    settings.Elevation = apvts.getRawParameterValue("Elevation")->load();
-//    settings.Roll = apvts.getRawParameterValue("Roll")->load();
-//    settings.Width = apvts.getRawParameterValue("Width")->load();
-//    settings.W = apvts.getRawParameterValue("W")->load();
-//    settings.X = apvts.getRawParameterValue("X")->load();
-//    settings.Y = apvts.getRawParameterValue("Y")->load();
-//    settings.Z = apvts.getRawParameterValue("Z")->load();
-//    return settings;
-//}
-
-//juce::AudioProcessorValueTreeState::ParameterLayout VST_PLUGAudioProcessor::createParameterLayout()
-//{
-//    juce::AudioProcessorValueTreeState::ParameterLayout layout;
-//
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "Azimuth",
-//        "Azimuth",
-//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-//
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "Elevation",
-//        "Elevation",
-//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-//
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "Roll",
-//        "Roll",
-//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-//
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "Width",
-//        "Width",
-//        juce::NormalisableRange<float>(0, 360.f, 1.f, 1.f), 0.f));
-//
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "W",
-//        "W",
-//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f),0.f));
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "X",
-//        "X",
-//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "Y",
-//        "Y",
-//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
-//    layout.add(std::make_unique<juce::AudioParameterFloat>(
-//        "Z",
-//        "Z",
-//        juce::NormalisableRange<float>(-1.f, 1.f, 0.01f, 1.f), 0.f));
-//
-//    juce::StringArray stringArray;
-//    for (int i = 0; i < 4; i++) {
-//        juce::String str;
-//        str << (12 + i * 12);
-//        str << "db\OCT";
-//        stringArray.add(str);
-//    }
-//
-//    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCust Slope", stringArray, 0));
-//    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
-//
-//    return layout;
-//}
 
 //==============================================================================
 // This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new VST_PLUGAudioProcessor();
 }
