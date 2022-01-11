@@ -55,7 +55,7 @@ VST_PLUGAudioProcessorEditor::~VST_PLUGAudioProcessorEditor()
 //==============================================================================
 void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
 {
-    
+    //Controls
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     g.drawText("Azimuth", ((getWidth() / 5) * 1) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
     g.drawText(std::to_string((int)azimuthKnob->getValue()), ((getWidth() / 5) * 1) - (100 / 2), (getHeight() / 5) - (100 / 2) + 5, 100, 100, Justification::centred, false);
@@ -122,7 +122,7 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         10,
         Justification::centred, false);
 
-    //Left channel
+    //Left chanel
     g.setColour(Colour::fromRGBA(0, 0, 255, 100));
     g.fillEllipse(
         ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()-180) * 3.14) / 180),
@@ -167,12 +167,6 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         100,
         100,
         Justification::centred, false);
-   
-   
-    //g.drawImageAt(headSideImage, 100, 10);
-    //g.drawImage(headTopImage, 10, 10, 100, 100, 10, 10, 100, 100);
-    //g.drawImageAt(headTopImage, 10, 10);
-
 }
 
 void VST_PLUGAudioProcessorEditor::resized()
