@@ -49,9 +49,9 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VST_PLUGAudioProcessorEditor)
 
-    // Odziedziczono za poúrednictwem elementu Timer
+    // Odziedziczono za po≈ìrednictwem elementu Timer
     virtual void timerCallback() override;
 
-    // Odziedziczono za poúrednictwem elementu Listener
+    // Odziedziczono za po≈ìrednictwem elementu Listener
     virtual void sliderValueChanged(Slider* slider) override;
 };

@@ -13,6 +13,8 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="SBeWFC" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="WYyofu" name="head_side.h" compile="0" resource="0" file="Source/head_side.h"/>
+    <FILE id="N60G4q" name="head_top.h" compile="0" resource="0" file="Source/head_top.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>

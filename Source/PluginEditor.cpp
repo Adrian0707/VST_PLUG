@@ -39,8 +39,10 @@ VST_PLUGAudioProcessorEditor::VST_PLUGAudioProcessorEditor (VST_PLUGAudioProcess
     elevationAttachment = new AudioProcessorValueTreeState::SliderAttachment(p.getState(), "elevation", *elevationKnob);
     rollAttachment = new AudioProcessorValueTreeState::SliderAttachment(p.getState(), "roll", *rollKnob);
     widthAttachment = new AudioProcessorValueTreeState::SliderAttachment(p.getState(), "width", *widthKnob);
-    headSideImage = ImageFileFormat::loadFrom(File("D:/PW-MAGISTERSKIE/PW-Magisterskie-sem2/SPD/PLUG_VST/VST_PLUG/Source/head_side.h"));
-    //headTopImage = ImageFileFormat::loadFrom(File("head_top.h"));
+
+    headSideImage = ImageCache::getFromFile(File("D:/PW-MAGISTERSKIE/PW-Magisterskie-sem2/SPD/PLUG_VST/VST_PLUG/Source/head_side.png"));
+    headTopImage = ImageCache::getFromFile(File("D:/PW-MAGISTERSKIE/PW-Magisterskie-sem2/SPD/PLUG_VST/VST_PLUG/Source/head_top.png"));
+
     setSize (600, 500);
 
     startTimerHz(30);
@@ -70,14 +72,15 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         g.fillEllipse((getWidth() / 2) - 250 + 10 * i, (getHeight() / 2) + 10 * i, 200- 20*i, 200-20*i);
     }
 
-    g.setColour(Colour::fromRGB(0, 0, 0));
-
+    g.setColour(Colour::fromRGB(155, 0, 155));
+    g.drawImage(headTopImage, (getWidth() / 2) - 200, (getHeight() / 2) +50, 100, 100, 0, 0, 512, 512);
     g.drawArrow(Line<float>(
         (getWidth() / 2) - 150,
         (getHeight() / 2) + 100,
         (getWidth() / 2) - 150 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180),
         (getHeight() / 2) + 100 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)), 5, 10, 10);
 
+    g.setColour(Colour::fromRGB(0, 0, 0));
     g.drawText("Front",
         (getWidth() / 2) - 200 + 180 * cos(((-90) * 3.14) / 180),
         (getHeight() / 2) + 100 + 180 * sin(((-90) * 3.14) / 180),
@@ -136,12 +139,13 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
     
     //Secound circle
     g.setColour(Colour::fromRGB(256, 100, 100));
-    //g.fillEllipse((getWidth() / 2) + 50, (getHeight() / 2), 200, 200);
     for (int i = 0; i < 10; i++) {
         g.setColour(Colour::fromRGBA(256, 100, 100, 50));
         g.fillEllipse((getWidth() / 2) + 50 + 10 * i, (getHeight() / 2) + 10 * i, 200 - 20 * i, 200 - 20 * i);
     }
-    g.setColour(Colour::fromRGB(0, 0, 0));
+    
+    g.setColour(Colour::fromRGB(0, 0, 255));
+    g.drawImage(headSideImage, (getWidth() / 2) + 50, (getHeight() / 2), 200, 200, 0, 0, 200, 200);
     g.drawArrow(Line<float>(
         (getWidth() / 2) + 150,
         (getHeight() / 2) + 100,
@@ -149,6 +153,7 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         (getHeight() / 2) + 100 + 100 * sin((((int)elevationKnob->getValue() + 180) * 3.14) / 180)), 5, 10, 10);
 
 
+    g.setColour(Colour::fromRGB(0, 0, 0));
     g.drawText("Top",
         (getWidth() / 2) + 100 + 180 * cos(((-90) * 3.14) / 180),
         (getHeight() / 2) + 100 + 180 * sin(((-90) * 3.14) / 180),
@@ -163,7 +168,10 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         100,
         Justification::centred, false);
    
-    g.drawImage(headSideImage, 0, 0, 100, 100,100,100,0,0);
+   
+    //g.drawImageAt(headSideImage, 100, 10);
+    //g.drawImage(headTopImage, 10, 10, 100, 100, 10, 10, 100, 100);
+    //g.drawImageAt(headTopImage, 10, 10);
 
 }
 
