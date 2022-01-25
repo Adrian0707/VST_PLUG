@@ -106,6 +106,11 @@ void VST_PLUGAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    crossover.setSampleRate(sampleRate);
+    crossoverOutput.setSize(2, samplesPerBlock);
+    hrirFilterL.prepare(samplesPerBlock);
+    hrirFilterR.prepare(samplesPerBlock);
+    monoInputBuffer.setSize(1, samplesPerBlock);
 }
 
 void VST_PLUGAudioProcessor::releaseResources()
@@ -142,7 +147,6 @@ bool VST_PLUGAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    return;
     ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -164,6 +168,9 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     elevation = (elevation * 3.14) / 180;
     roll = (roll * 3.14) / 180;
     width = (width * 3.14) / 180;
+
+    hrtfContainer.updateHRIR(azimuth, elevation);
+    crossover.setCrossoverFrequency(3000);
 
     // FROM OTHER PROJECT
 
@@ -195,19 +202,19 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     hrirFilterL.process(bufferLChannel, bufferLength);
     hrirFilterR.process(bufferRChannel, bufferLength);
 
-    //// fill stereo output
-    //const auto wetRatio = wetPercentParam->getValueAndMarkRead() / 100;
-    //const auto dryRatio = 1 - wetRatio;
-    //const auto lowPassInput = crossoverOutput.getReadPointer(Crossover::loPassChannelIndex);
-    //for (auto i = 0; i < bufferLength; i++)
-    //{
-    //    const auto monoIn = *monoInputBuffer.getReadPointer(0, i);
-    //    const auto gain = Decibels::decibelsToGain(gainDbParam->getValueAndMarkRead());
-    //    bufferLChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferLChannel[i]) + dryRatio * monoIn;
-    //    bufferRChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferRChannel[i]) + dryRatio * monoIn;
-    //}
-    //  
-    ////
+    // fill stereo output
+    const auto wetRatio = 1;
+    const auto dryRatio = 1 - wetRatio;
+    const auto lowPassInput = crossoverOutput.getReadPointer(Crossover::loPassChannelIndex);
+    for (auto i = 0; i < bufferLength; i++)
+    {
+        const auto monoIn = *monoInputBuffer.getReadPointer(0, i);
+        const auto gain = 1;
+        bufferLChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferLChannel[i]) + dryRatio * monoIn;
+        bufferRChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferRChannel[i]) + dryRatio * monoIn;
+    }
+      
+    //
   
     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
     //{
