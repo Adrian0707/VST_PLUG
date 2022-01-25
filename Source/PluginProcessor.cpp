@@ -142,6 +142,7 @@ bool VST_PLUGAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
+    return;
     ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -163,43 +164,72 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     elevation = (elevation * 3.14) / 180;
     roll = (roll * 3.14) / 180;
     width = (width * 3.14) / 180;
-    float W, X, Y, Z;
 
-    float fCosAzim = cosf(azimuth);
-    float fSinAzim = sinf(azimuth);
-    float fCosElev = cosf(elevation);
-    float fSinElev = sinf(elevation);
+    // FROM OTHER PROJECT
 
-    float fCos2Azim = cosf(2.f * azimuth);
-    float fSin2Azim = sinf(2.f * azimuth);
-    float fSin2Elev = sinf(2.f * elevation);
+    auto bufferLChannel = buffer.getWritePointer(0);
+    auto bufferRChannel = buffer.getWritePointer(1);
+    const auto bufferLength = buffer.getNumSamples();
 
-    W = 1;
-    X = (fCosAzim * fCosElev);
-    Y = (fSinAzim * fCosElev);
-    Z = (fSinElev);
-
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    // downmix to mono in case of a stereo input
+    // by adding from the right channel to left channel
+    if (getTotalNumInputChannels() == 2)
     {
-        auto* channelData = buffer.getWritePointer(channel);
-
-        for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
-            //channelData[sample] = channelData[sample]; //* mAzimuth;
-
-
-            //float cleanSig = *channelData;
-            //*channelData *= azimuth * elevation;
-            //*channelData = (((((2.f / 3.14f) * atan(*channelData)) * roll) + (cleanSig * (1.f / roll))) / 2) * width;
-            
-            if (channel == 0) {
-                *channelData = (sqrt(2) * W * *channelData + X * *channelData - Y * *channelData) * sqrt(8);
-            }
-            if (channel == 1) {
-                *channelData = (sqrt(2) * W * *channelData - X * *channelData + Y * *channelData) * sqrt(8);
-            }
-            channelData++;
-        }
+        buffer.addFrom(0, 0, bufferRChannel, bufferLength);
+        buffer.applyGain(0.5f);
     }
+    monoInputBuffer.copyFrom(0, 0, buffer, 0, 0, bufferLength);
+
+    // split the input signal into two bands, only freqs above crossover's f0
+    // will be spatialized
+    crossover.process(buffer, 0, crossoverOutput);
+
+    // we need to copy the hi-pass input to buffers
+    buffer.copyFrom(0, 0, crossoverOutput, Crossover::hiPassChannelIndex, 0, bufferLength);
+    buffer.copyFrom(1, 0, crossoverOutput, Crossover::hiPassChannelIndex, 0, bufferLength);
+
+    // actual hrir filtering
+    const auto& hrir = hrtfContainer.hrir();
+    hrirFilterL.setImpulseResponse(hrir.leftEarIR);
+    hrirFilterR.setImpulseResponse(hrir.rightEarIR);
+    hrirFilterL.process(bufferLChannel, bufferLength);
+    hrirFilterR.process(bufferRChannel, bufferLength);
+
+    //// fill stereo output
+    //const auto wetRatio = wetPercentParam->getValueAndMarkRead() / 100;
+    //const auto dryRatio = 1 - wetRatio;
+    //const auto lowPassInput = crossoverOutput.getReadPointer(Crossover::loPassChannelIndex);
+    //for (auto i = 0; i < bufferLength; i++)
+    //{
+    //    const auto monoIn = *monoInputBuffer.getReadPointer(0, i);
+    //    const auto gain = Decibels::decibelsToGain(gainDbParam->getValueAndMarkRead());
+    //    bufferLChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferLChannel[i]) + dryRatio * monoIn;
+    //    bufferRChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferRChannel[i]) + dryRatio * monoIn;
+    //}
+    //  
+    ////
+  
+    //for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    //{
+    //    auto* channelData = buffer.getWritePointer(channel);
+
+    //    for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
+    //        //channelData[sample] = channelData[sample]; //* mAzimuth;
+
+
+    //        //float cleanSig = *channelData;
+    //        //*channelData *= azimuth * elevation;
+    //        //*channelData = (((((2.f / 3.14f) * atan(*channelData)) * roll) + (cleanSig * (1.f / roll))) / 2) * width;
+    //        
+    //        if (channel == 0) {
+    //            *channelData = (sqrt(2) * W * *channelData + X * *channelData - Y * *channelData) * sqrt(8);
+    //        }
+    //        if (channel == 1) {
+    //            *channelData = (sqrt(2) * W * *channelData - X * *channelData + Y * *channelData) * sqrt(8);
+    //        }
+    //        channelData++;
+    //    }
+    //}
 }
 
 AudioProcessorValueTreeState& VST_PLUGAudioProcessor::getState() {

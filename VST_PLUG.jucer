@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="RnpnTq" name="VST_PLUG" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
               cppLanguageStandard="17">
   <MAINGROUP id="KysDIc" name="VST_PLUG">
     <GROUP id="{B66D8A62-A13C-9A48-64A1-7F65F1CC82EF}" name="Source">
+      <GROUP id="{41DB201F-8879-8381-1F50-51D8ABC6804D}" name="delaunay">
+        <FILE id="XU55d6" name="delaunay.cpp" compile="1" resource="0" file="Source/delaunay/delaunay.cpp"/>
+        <FILE id="IPIOM8" name="delaunay.h" compile="0" resource="0" file="Source/delaunay/delaunay.h"/>
+        <FILE id="sSqRbg" name="edge.h" compile="0" resource="0" file="Source/delaunay/edge.h"/>
+        <FILE id="VTOF6Y" name="LICENSE" compile="0" resource="1" file="Source/delaunay/LICENSE"/>
+        <FILE id="tnU3pw" name="triangle.cpp" compile="1" resource="0" file="Source/delaunay/triangle.cpp"/>
+        <FILE id="dIYZhh" name="triangle.h" compile="0" resource="0" file="Source/delaunay/triangle.h"/>
+        <FILE id="XLNdwD" name="vector2.h" compile="0" resource="0" file="Source/delaunay/vector2.h"/>
+      </GROUP>
+      <GROUP id="{063F9967-4EFD-E260-64E3-F00C2D50ADF7}" name="images">
+        <FILE id="Mamzyg" name="head_side.h" compile="0" resource="0" file="Source/images/head_side.h"/>
+        <FILE id="TSvR0A" name="head_top.h" compile="0" resource="0" file="Source/images/head_top.h"/>
+        <FILE id="WlSb4x" name="source_icon.h" compile="0" resource="0" file="Source/images/source_icon.h"/>
+      </GROUP>
+      <FILE id="wIDZV7" name="AtomicAudioParameter.cpp" compile="1" resource="0"
+            file="Source/AtomicAudioParameter.cpp"/>
+      <FILE id="um3JGh" name="AtomicAudioParameter.h" compile="0" resource="0"
+            file="Source/AtomicAudioParameter.h"/>
+      <FILE id="rwnEEr" name="Crossover.cpp" compile="1" resource="0" file="Source/Crossover.cpp"/>
+      <FILE id="b0PyOb" name="Crossover.h" compile="0" resource="0" file="Source/Crossover.h"/>
+      <FILE id="EyJeKM" name="head_side.png" compile="0" resource="1" file="Source/head_side.png"/>
+      <FILE id="IENH34" name="head_top.png" compile="0" resource="1" file="Source/head_top.png"/>
+      <FILE id="V0Gxu0" name="HRIRFilter.cpp" compile="1" resource="0" file="Source/HRIRFilter.cpp"/>
+      <FILE id="PsO0GH" name="HRIRFilter.h" compile="0" resource="0" file="Source/HRIRFilter.h"/>
+      <FILE id="g6N2Fp" name="HRTFContainer.cpp" compile="1" resource="0"
+            file="Source/HRTFContainer.cpp"/>
+      <FILE id="YzIQzy" name="HRTFContainer.h" compile="0" resource="0" file="Source/HRTFContainer.h"/>
+      <FILE id="ymd39m" name="OouraFFT.cpp" compile="1" resource="0" file="Source/OouraFFT.cpp"/>
+      <FILE id="OOudR5" name="OouraFFT.h" compile="0" resource="0" file="Source/OouraFFT.h"/>
+      <FILE id="rZquOc" name="Util.h" compile="0" resource="0" file="Source/Util.h"/>
       <FILE id="w1gFuZ" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="Iev5me" name="PluginProcessor.h" compile="0" resource="0"

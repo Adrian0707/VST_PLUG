@@ -9,6 +9,10 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "HRTFContainer.h"
+#include "HRIRFilter.h"
+#include "Crossover.h"
+
 using namespace juce;
 
 //==============================================================================
@@ -57,6 +61,13 @@ public:
     AudioProcessorValueTreeState& getState();
 private:
     ScopedPointer<AudioProcessorValueTreeState> state;
+
+    HRIRFilter hrirFilterL;
+    HRIRFilter hrirFilterR;
+    HRTFContainer hrtfContainer;
+    AudioSampleBuffer crossoverOutput;
+    Crossover crossover;
+    AudioSampleBuffer monoInputBuffer;
 
 
     //==============================================================================
