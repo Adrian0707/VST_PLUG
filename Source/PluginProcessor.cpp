@@ -170,7 +170,7 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     width = (width * 3.14) / 180;
 
     hrtfContainer.updateHRIR(azimuth, elevation);
-    crossover.setCrossoverFrequency(3000);
+    crossover.setCrossoverFrequency(2000);
 
     // FROM OTHER PROJECT
 
@@ -209,7 +209,7 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     for (auto i = 0; i < bufferLength; i++)
     {
         const auto monoIn = *monoInputBuffer.getReadPointer(0, i);
-        const auto gain = 1;
+        const auto gain = 100;
         bufferLChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferLChannel[i]) + dryRatio * monoIn;
         bufferRChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferRChannel[i]) + dryRatio * monoIn;
     }
