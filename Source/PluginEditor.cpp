@@ -56,14 +56,15 @@ VST_PLUGAudioProcessorEditor::~VST_PLUGAudioProcessorEditor()
 void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
 {
     //Controls
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-    g.drawText("Azimuth", ((getWidth() / 5) * 1) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
+    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));\
+    g.setColour(Colour::fromRGBA(255, 255, 255,  175));
+    g.drawText("Azimuth [deg]", ((getWidth() / 5) * 1) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
     g.drawText(std::to_string((int)azimuthKnob->getValue()), ((getWidth() / 5) * 1) - (100 / 2), (getHeight() / 5) - (100 / 2) + 5, 100, 100, Justification::centred, false);
-    g.drawText("Elevation", ((getWidth() / 5) * 2) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
+    g.drawText("Elevation [deg]", ((getWidth() / 5) * 2) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
     g.drawText(std::to_string((int)elevationKnob->getValue()), ((getWidth() / 5) * 2) - (100 / 2), (getHeight() / 5) - (100 / 2) - 50, 100, 100, Justification::centred, false);
-    g.drawText("Roll", ((getWidth() / 5) * 3) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
+    g.drawText("Cutoff Freq [Hz]", ((getWidth() / 5) * 3) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
     g.drawText(std::to_string((int)rollKnob->getValue()), ((getWidth() / 5) * 3) - (100 / 2), (getHeight() / 5) - (100 / 2) + 5, 100, 100, Justification::centred, false);
-    g.drawText("Width", ((getWidth() / 5) * 4) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
+    g.drawText("Gain [dB]", ((getWidth() / 5) * 4) - (100 / 2), (getHeight() / 5) - (100 / 2) + 50, 100, 100, Justification::centred, false);
     g.drawText(std::to_string((int)widthKnob->getValue()), ((getWidth() / 5) * 4) - (100 / 2), (getHeight() / 5) - (100 / 2) - 50, 100, 100, Justification::centred, false);
 
     //First circle
@@ -80,7 +81,8 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         (getWidth() / 2) - 150 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180),
         (getHeight() / 2) + 100 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)), 5, 10, 10);
 
-    g.setColour(Colour::fromRGB(0, 0, 0));
+    g.setColour(Colour::fromRGBA(255, 255, 255,  175));
+
     g.drawText("Front",
         (getWidth() / 2) - 200 + 180 * cos(((-90) * 3.14) / 180),
         (getHeight() / 2) + 100 + 180 * sin(((-90) * 3.14) / 180),
@@ -108,34 +110,34 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         100,
         Justification::centred, false);
     //R chanel
-    g.setColour(Colour::fromRGBA(255, 0, 0, 100));
-    g.fillEllipse(
-        ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()) * 3.14) / 180),
-        ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180))+ (int)widthKnob->getValue()* sin((((int)rollKnob->getValue()) * 3.14) / 180),
-        10,
-        10);
-    g.setColour(Colour::fromRGB(0, 0, 0));
-    g.drawText("R",
-        ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()) * 3.14) / 180),
-        ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * sin((((int)rollKnob->getValue()) * 3.14) / 180),
-        10,
-        10,
-        Justification::centred, false);
+    //g.setColour(Colour::fromRGBA(255, 0, 0, 100));
+    //g.fillEllipse(
+    //    ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()) * 3.14) / 180),
+    //    ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180))+ (int)widthKnob->getValue()* sin((((int)rollKnob->getValue()) * 3.14) / 180),
+    //    10,
+    //    10);
+    //g.setColour(Colour::fromRGB(0, 0, 0));
+    //g.drawText("R",
+    //    ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()) * 3.14) / 180),
+    //    ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * sin((((int)rollKnob->getValue()) * 3.14) / 180),
+    //    10,
+    //    10,
+    //    Justification::centred, false);
 
-    //Left chanel
-    g.setColour(Colour::fromRGBA(0, 0, 255, 100));
-    g.fillEllipse(
-        ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()-180) * 3.14) / 180),
-        ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * sin((((int)rollKnob->getValue()-180) * 3.14) / 180),
-        10,
-        10);
-    g.setColour(Colour::fromRGB(0, 0, 0));
-    g.drawText("L",
-        ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue() - 180) * 3.14) / 180),
-        ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * sin((((int)rollKnob->getValue() - 180) * 3.14) / 180),
-        10,
-        10,
-        Justification::centred, false);
+    ////Left chanel
+    //g.setColour(Colour::fromRGBA(0, 0, 255, 100));
+    //g.fillEllipse(
+    //    ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue()-180) * 3.14) / 180),
+    //    ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * sin((((int)rollKnob->getValue()-180) * 3.14) / 180),
+    //    10,
+    //    10);
+    //g.setColour(Colour::fromRGB(0, 0, 0));
+    //g.drawText("L",
+    //    ((getWidth() / 2) - 155 + 100 * cos((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * cos((((int)rollKnob->getValue() - 180) * 3.14) / 180),
+    //    ((getHeight() / 2) + 95 + 100 * sin((((int)azimuthKnob->getValue() - 90) * 3.14) / 180)) + (int)widthKnob->getValue() * sin((((int)rollKnob->getValue() - 180) * 3.14) / 180),
+    //    10,
+    //    10,
+    //    Justification::centred, false);
     
     //Secound circle
     g.setColour(Colour::fromRGB(256, 100, 100));
@@ -153,7 +155,7 @@ void VST_PLUGAudioProcessorEditor::paint (Graphics& g)
         (getHeight() / 2) + 100 + 100 * sin((((int)elevationKnob->getValue() + 180) * 3.14) / 180)), 5, 10, 10);
 
 
-    g.setColour(Colour::fromRGB(0, 0, 0));
+    g.setColour(Colour::fromRGBA(255, 255, 255,  175));
     g.drawText("Top",
         (getWidth() / 2) + 100 + 180 * cos(((-90) * 3.14) / 180),
         (getHeight() / 2) + 100 + 180 * sin(((-90) * 3.14) / 180),

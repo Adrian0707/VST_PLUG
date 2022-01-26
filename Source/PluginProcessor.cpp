@@ -24,15 +24,32 @@ VST_PLUGAudioProcessor::VST_PLUGAudioProcessor()
 #endif
 {
     state = new AudioProcessorValueTreeState(*this, nullptr);
-    state->createAndAddParameter("azimuth", "Azimuth", "Azimuth", NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("azimuth", "Azimuth", "Azimuth", NormalisableRange<float>(-180.f, 180.f, 1.f), 0, nullptr, nullptr);
     state->createAndAddParameter("elevation", "Elevation", "Elevation", NormalisableRange<float>(-90.f, 90.f, 1.f), 0, nullptr, nullptr);
-    state->createAndAddParameter("roll", "Roll", "Roll", NormalisableRange<float>(0.f, 360.f, 1.f), 0, nullptr, nullptr);
-    state->createAndAddParameter("width", "Width", "Width", NormalisableRange<float>(0.f, 120.f, 1.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("roll", "Roll", "Roll", NormalisableRange<float>(0.f, 10000.f, 50.f), 0, nullptr, nullptr);
+    state->createAndAddParameter("width", "Width", "Width", NormalisableRange<float>(0.f, 100.f, 5.f), 0, nullptr, nullptr);
 
     state->state = ValueTree("azimuth");
     state->state = ValueTree("elevation");
     state->state = ValueTree("roll");
     state->state = ValueTree("width");
+
+
+
+    // load HRIR
+    auto thisDir = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory();
+    try
+    {
+        hrtfContainer.loadHrir(thisDir.getFullPathName() + "/hrir/kemar.bin");
+        hrirLoaded = true;
+    }
+    catch (std::ios_base::failure&)
+    {
+        hrirLoaded = false;
+    }
+    hrtfContainer.updateHRIR(0, 0);
+
+    setLatencySamples(HRIRBuffer::HRIR_SIZE / 2); // 
 }
 
 VST_PLUGAudioProcessor::~VST_PLUGAudioProcessor()
@@ -151,26 +168,18 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
     float azimuth = *state->getRawParameterValue("azimuth");
     float elevation = *state->getRawParameterValue("elevation");
     float roll = *state->getRawParameterValue("roll");
     float width = *state->getRawParameterValue("width");
-    azimuth = (azimuth * 3.14) / 180;
-    elevation = (elevation * 3.14) / 180;
-    roll = (roll * 3.14) / 180;
-    width = (width * 3.14) / 180;
+
+    std::cout << "Hello";
 
     hrtfContainer.updateHRIR(azimuth, elevation);
-    crossover.setCrossoverFrequency(2000);
+    if (roll > 0) 
+    {
+        crossover.setCrossoverFrequency(roll);
+    }
 
     // FROM OTHER PROJECT
 
@@ -209,34 +218,12 @@ void VST_PLUGAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
     for (auto i = 0; i < bufferLength; i++)
     {
         const auto monoIn = *monoInputBuffer.getReadPointer(0, i);
-        const auto gain = 100;
+        const auto gain = width / 10;
         bufferLChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferLChannel[i]) + dryRatio * monoIn;
         bufferRChannel[i] = gain * wetRatio * (lowPassInput[i] + bufferRChannel[i]) + dryRatio * monoIn;
     }
       
-    //
-  
-    //for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    //{
-    //    auto* channelData = buffer.getWritePointer(channel);
 
-    //    for (int sample = 0; sample < buffer.getNumSamples(); sample++) {
-    //        //channelData[sample] = channelData[sample]; //* mAzimuth;
-
-
-    //        //float cleanSig = *channelData;
-    //        //*channelData *= azimuth * elevation;
-    //        //*channelData = (((((2.f / 3.14f) * atan(*channelData)) * roll) + (cleanSig * (1.f / roll))) / 2) * width;
-    //        
-    //        if (channel == 0) {
-    //            *channelData = (sqrt(2) * W * *channelData + X * *channelData - Y * *channelData) * sqrt(8);
-    //        }
-    //        if (channel == 1) {
-    //            *channelData = (sqrt(2) * W * *channelData - X * *channelData + Y * *channelData) * sqrt(8);
-    //        }
-    //        channelData++;
-    //    }
-    //}
 }
 
 AudioProcessorValueTreeState& VST_PLUGAudioProcessor::getState() {
@@ -276,6 +263,7 @@ void VST_PLUGAudioProcessor::setStateInformation (const void* data, int sizeInBy
         state->state = tree;
     }
 }
+
 
 //==============================================================================
 // This creates new instances of the plugin..

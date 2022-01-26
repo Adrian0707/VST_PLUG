@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="RnpnTq" name="VST_PLUG" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="1" displaySplashScreen="1" jucerFormatVersion="1"
-              cppLanguageStandard="17">
+              cppLanguageStandard="17" pluginVST3Category="Fx">
   <MAINGROUP id="KysDIc" name="VST_PLUG">
     <GROUP id="{B66D8A62-A13C-9A48-64A1-7F65F1CC82EF}" name="Source">
       <GROUP id="{41DB201F-8879-8381-1F50-51D8ABC6804D}" name="delaunay">

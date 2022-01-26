@@ -30,6 +30,7 @@ public:
 
 
 private:
+    void processParameterChanges();
     Atomic<bool> parametersChanged{ false };
 
     Image headTopImage;

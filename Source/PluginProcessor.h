@@ -68,6 +68,7 @@ private:
     AudioSampleBuffer crossoverOutput;
     Crossover crossover;
     AudioSampleBuffer monoInputBuffer;
+    bool hrirLoaded;
 
 
     //==============================================================================
